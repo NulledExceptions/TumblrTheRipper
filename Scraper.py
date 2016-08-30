@@ -35,14 +35,15 @@ class Scraper(object):
             if((postlist or xmldoc)==False):
                 pass
             for eachpost in postlist:
-                #print eachpost.attributes['type'].value
+                #print(eachpost.attributes['type'].value)
+                if (self.tagging):
+                    tags = eachpost.getElementsByTagName('tag')
+                    if not (self.checkTags(self.checklist, tags)):
+                        pass
+
                 if eachpost.attributes['type'].value == 'photo':
                     urls =eachpost.getElementsByTagName('photo-url')
 
-                    if(self.tagging):
-                        tags = eachpost.getElementsByTagName('tag')
-                        if not (self.checkTags(self.checklist, tags)):
-                            pass
 
                     for eachurl in urls:
                         imageUrl = self.getImageUrl(eachurl)
@@ -60,14 +61,12 @@ class Scraper(object):
                         videoFile=scraperNetwork.getURL(videoUrl)
                         if videoFile:
                             videoFilename = scraperIO.formatVideoName(videoUrl)
-                            if(videoFilename):
-                                print (videoFilename)
+                            if videoFilename:
+                                print(videoFilename)
                                 scraperIO.writeFile(videoFilename,videoFile)
 
     def getTotalPosts(self,url):
-        scraperNetwork=Network()
-
-        xmldoc = scraperNetwork.getURL(url)
+        xmldoc = Network().getURL(url)
         if xmldoc:
             try:
                 xmldoc = minidom.parse(xmldoc)
@@ -77,7 +76,7 @@ class Scraper(object):
                 #return flase
 
             try:
-                itemlist = xmldoc.getElementsByTagName('posts')
+                itemlist= xmldoc.getElementsByTagName('posts')
                 return itemlist[0].attributes['total'].value
             except ExpatError:
                 print("No posts or total, check url..")
