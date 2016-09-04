@@ -3,19 +3,33 @@ from Scraper import Scraper
 from Parser import Parser
 import os
 from DBSQLLite import DBSQLLite
+import atexit
+import logging
+
+
+
 
 def printPercentage(start, total):
     percent = float(start) / float(total) * 100
     print ("{0:.2f}".format(percent)+ "%  " + str(start) + " of total: " + str(total))
 
+
+def cleanUp(url, current,total):
+    logger = logging.getLogger(__name__)
+    records = (url, current, total)
+    logger.debug('Records: %s', records)
+    logger.info('Updating records ...')
+    #u
+    #sql queries
 def main():
 
-    testurl= 'http://abc.tumblr.com/'
+    testurl= ''
     '''
     '''
     # baseInput = sys.argv[1]
-
-    initialScraper = Scraper()
+    logging.basicConfig(level=logging.INFO)
+    logger = logging.getLogger(__name__)
+    logger.info('Start blog: '+testurl)
 
     inputurl=Parser().formatInput(testurl)
     print (inputurl)
@@ -24,7 +38,11 @@ def main():
     Parser().mkdirs(dirname)
     os.chdir(dirname)
 
-    total = initialScraper.getTotalPosts(inputurl)
+    total = Scraper().getTotalPosts(inputurl)
+    records = (inputurl, '0', total)
+    logger.debug('Records: %s', records)
+    logger.info('Updating records ...')
+
     if(total and int(total)>0):
         start=0
         while( start <= int(total)):
@@ -33,9 +51,17 @@ def main():
                  url=inputurl
              else:
                 url= inputurl + '?start=' + str(start)
-             initialScraper.scrapePage(url)
+             Scraper().scrapePage(url)
              start += 20
 
+        records=(inputurl,start,total)
+        logger.debug('Records: %s', records)
+        logger.info('Updating records ...')
+        atexit.register(cleanUp, inputurl, start, total)
+
+        # update records here
+
+        logger.info('Finish updating records')
 
 if __name__== '__main__':
     main()

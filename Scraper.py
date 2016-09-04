@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from Network import Network
 from Parser import Parser
 from xml.dom import minidom
@@ -10,7 +12,8 @@ from DBSQLLite import DBSQLLite
 class Scraper(object):
     def __init__(self):
         self.tagging = False
-        self.checklist = []
+        self.checklist = ('<tag>me</tag>', '<tag>me</tag>')
+        self.ignore_format=['.gif','.png']
 
 
 
@@ -37,9 +40,8 @@ class Scraper(object):
             for eachpost in postlist:
                 #print(eachpost.attributes['type'].value)
                 if (self.tagging):
-                    tags = eachpost.getElementsByTagName('tag')
-                    if not (self.checkTags(self.checklist, tags)):
-                        pass
+                    if not self.checkTags(eachpost):
+                        continue
 
                 if eachpost.attributes['type'].value == 'photo':
                     urls =eachpost.getElementsByTagName('photo-url')
@@ -50,9 +52,9 @@ class Scraper(object):
                         if imageUrl:
                             imageFile=scraperNetwork.getURL(imageUrl)
                             if imageFile:
+                                #print(imageFile.headers.items())
                                 imageFilename=scraperIO.formatImageName(imageUrl)
                                 if(imageFilename):
-                                    print (imageFilename)
                                     scraperIO.writeFile(imageFilename,imageFile)
 
                 if eachpost.attributes['type'].value == 'video':
@@ -62,7 +64,6 @@ class Scraper(object):
                         if videoFile:
                             videoFilename = scraperIO.formatVideoName(videoUrl)
                             if videoFilename:
-                                print(videoFilename)
                                 scraperIO.writeFile(videoFilename,videoFile)
 
     def getTotalPosts(self,url):
@@ -72,16 +73,24 @@ class Scraper(object):
                 xmldoc = minidom.parse(xmldoc)
             except ExpatError:
                 print('unxexpected xml format')
+                return False
                 #log
                 #return flase
+            except OSError:
+                print('unxexpected os error ')
+                return False
 
-            try:
-                itemlist= xmldoc.getElementsByTagName('posts')
-                return itemlist[0].attributes['total'].value
-            except ExpatError:
-                print("No posts or total, check url..")
-                #log
-                #return flase
+
+            else:
+
+                try:
+                    itemlist= xmldoc.getElementsByTagName('posts')
+                    return itemlist[0].attributes['total'].value
+                except ExpatError:
+                    print("No posts or total, check url..")
+                    #log
+                    #return flase
+                return False
 
     def getImageUrl(self,url):
         size = 0
@@ -112,17 +121,18 @@ class Scraper(object):
             pass
             #return flase , e
 
+    def checkTags(self,eachpost):
+        tags = eachpost.getElementsByTagName('tag')
+        tags_found=False
+        for tag in tags:
+            # print(tag.toxml())
+            if tag.toxml() in self.checklist:
+                tags_found=True
 
-    def checkTags(self,checklist,tags):
-        if(checklist==None):
-            print('no checklist for tags available')
-            return False
-        if(tags==None):
+        if tags_found:
+            print("match found")
+            return True
+        else:
             return False
 
-        for word in checklist:
-            if(word in tags):
-                print('Tag Found')
-                return True
-        return False
 
