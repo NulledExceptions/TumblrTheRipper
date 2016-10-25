@@ -11,12 +11,13 @@ def printPercentage(start, total):
     print("{0:.2f}".format(percent)+ "%  " + str(start) + " of " + str(total))
 
 def blogExists():
-    carry_on= input('already exists. Would you like to continue anyways?(y/n)')
+    carry_on= input('Already exists in database. Would you like to continue anyways?(y/n)')
     if (carry_on =='y'):
         return True
     elif (carry_on =='n'):
         quit()
     else:
+        print("invalid input. (y/n)")
         blogExists()
 
 def cleanUp(records):
@@ -56,26 +57,19 @@ def main():
 
 
     if(records['total'] and int(records['total'])>0):
-        start=0
-        while( start <= int(records['total'])):
-             printPercentage(start, records['total'])
-             if(start ==0):
+        while(records['current'] <= int(records['total'])):
+             printPercentage(records['current'], records['total'])
+             if(records['current']==0):
                  url=inputurl
              else:
-                url= inputurl + '?start=' + str(start)
+                url= inputurl + '?start=' + str(records['current'])
              Scraper(tagging).scrapePage(url)
-             start += 20
-             records['current'] = 0
+             records['current'] += 20
 
-        records['current']=start-20
         #SQLLITE().insert(records)
         logger.debug('Records: %s', records)
         logger.info('Updating records ...')
         atexit.register(cleanUp, records)
 
-        # update records here
-
-        logger.info('Finish updating records')
-
-if __name__== '__main__':
+if __name__ == '__main__':
     main()
