@@ -4,15 +4,10 @@ import errno
 from os.path import expanduser
 import logging
 
-
-
-
 class Parser(object):
-    #remove instantiation, make methods static
-    def __init__(self):
-        pass
 
-    def formatImageName(self, url):
+    @staticmethod
+    def formatImageName(url):
         try:
             filename = url.rsplit('tumblr_', 1)[1]
         except IndexError as e:
@@ -21,7 +16,8 @@ class Parser(object):
         else:
             return filename
 
-    def formatVideoName(self, url):
+    @staticmethod
+    def formatVideoName(url):
         try:
             filename = url.rsplit('tumblr_', 1)[1] + '.mp4'
         except IndexError as e:
@@ -30,7 +26,8 @@ class Parser(object):
         else:
             return filename
 
-    def writeFile(self, filename, file):
+    @staticmethod
+    def writeFile(filename, file):
         localImage = open(filename, 'wb')
         try:
             localImage.write(file.read())
@@ -40,7 +37,8 @@ class Parser(object):
             pass
         localImage.close()
 
-    def mkdirs(self, newdir, mode=0o777):
+    @staticmethod
+    def mkdirs(newdir, mode=0o777):
         home = expanduser("~")+'/Tumblr/'
         newdir=home+newdir
         try: os.makedirs(newdir, mode)
@@ -49,8 +47,12 @@ class Parser(object):
                 raise exc
             pass
         os.chdir(newdir)
-    ##STRIP WHITE SPACE
-    def formatInput(self, input):
+
+
+    @staticmethod
+    def formatInput(input):
+        ##STRIP WHITE SPACE!!
+
         if input[-1] == '/':
             input =input[:-1]
         if not input.endswith('.tumblr.com'):
@@ -62,7 +64,8 @@ class Parser(object):
             quit()
         return input + '/api/read'
 
-    def getDirectoryName(self, url, tagging):
+    @staticmethod
+    def getDirectoryName(url, tagging):
         #readable, re would be better
         url = url.replace(".tumblr.com","")
         url = url.replace("http://","")
