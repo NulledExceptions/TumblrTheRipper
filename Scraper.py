@@ -14,11 +14,13 @@ class Scraper(object):
     def __init__(self, tagging=False):
         self.tagging = tagging
         self.ignore_file_types=False
-        self.checklist = ('<tag>me</tag>','<tag>mine</tag>')
+        # self.checklist = ('<tag>me</tag>', '<tag>mine</tag>','<tag>self</tag>','<tag>myself</tag>',
+        #                   '<tag>personal</tag>','<tag>her</tag>')
+        self.checklist = ('<tag>me</tag>')
         self.ignore_format=['.gif','.png']
 
     def scrapePage(self, url):
-        scraperIO = Parser()
+
         scraperNetwork=Network()
 
         tumblrPage=scraperNetwork.getURL(url)
@@ -56,9 +58,9 @@ class Scraper(object):
                             imageFile=scraperNetwork.getURL(imageUrl)
                             if imageFile:
                                 #logging.debug(imageFile.headers.items())
-                                imageFilename=scraperIO.formatImageName(imageUrl)
+                                imageFilename=Parser.formatImageName(imageUrl)
                                 if(imageFilename):
-                                    scraperIO.writeFile(imageFilename,imageFile)
+                                    Parser.writeFile(imageFilename,imageFile)
                                     #logging.debug(eachpost.attributes.keys())
                                     image={
                                         'name':imageFilename,
@@ -76,9 +78,9 @@ class Scraper(object):
                     if videoUrl:
                         videoFile=scraperNetwork.getURL(videoUrl)
                         if videoFile:
-                            videoFilename = scraperIO.formatVideoName(videoUrl)
+                            videoFilename = Parser.formatVideoName(videoUrl)
                             if videoFilename:
-                                scraperIO.writeFile(videoFilename,videoFile)
+                                Parser.writeFile(videoFilename,videoFile)
 
     def getTotalPosts(self,url):
         xmldoc = Network().getURL(url)
