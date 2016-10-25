@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 from Network import Network
 from Parser import Parser
 from xml.dom import minidom
@@ -8,22 +7,15 @@ from SQLLITE import SQLLITE
 import logging
 
 
-
-
 class Scraper(object):
     def __init__(self, tagging=False):
         self.tagging = tagging
         self.ignore_file_types=False
-        # self.checklist = ('<tag>me</tag>', '<tag>mine</tag>','<tag>self</tag>','<tag>myself</tag>',
-        #                   '<tag>personal</tag>','<tag>her</tag>')
-        self.checklist = ('<tag>me</tag>')
+        self.checklist = ('<tag>me</tag>', '<tag>mine</tag>')
         self.ignore_format=['.gif','.png']
 
     def scrapePage(self, url):
-
-        scraperNetwork=Network()
-
-        tumblrPage=scraperNetwork.getURL(url)
+        tumblrPage=Network.getURL(url)
         if not (tumblrPage):
             pass
 
@@ -55,7 +47,7 @@ class Scraper(object):
                     for eachurl in urls:
                         imageUrl = self.getImageUrl(eachurl)
                         if imageUrl:
-                            imageFile=scraperNetwork.getURL(imageUrl)
+                            imageFile=Network.getURL(imageUrl)
                             if imageFile:
                                 #logging.debug(imageFile.headers.items())
                                 imageFilename=Parser.formatImageName(imageUrl)
@@ -76,7 +68,7 @@ class Scraper(object):
                 if eachpost.attributes['type'].value == 'video':
                     videoUrl= self.getVideoUrl(eachpost)
                     if videoUrl:
-                        videoFile=scraperNetwork.getURL(videoUrl)
+                        videoFile=Network.getURL(videoUrl)
                         if videoFile:
                             videoFilename = Parser.formatVideoName(videoUrl)
                             if videoFilename:
