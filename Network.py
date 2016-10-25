@@ -7,23 +7,22 @@ from socket import timeout
 import logging
 
 class Network(object):
-    def getUrlFileHeaders(self,url):
-        file=self.getURL(url)
+    @staticmethod
+    def getUrlFileHeaders(url):
+        file=Network.getURL(url)
         if file.header.items():
             return file.headers.items()
         else:
             return None
-
-    def getFileHeaders(self,file):
+    @staticmethod
+    def getFileHeaders(file):
         if file.headers.items():
             return file.headers.items()
         else:
             return None
 
-
-
-
-    def getURL(self,url):
+    @staticmethod
+    def getURL(url):
         liveURL = ''
         req = urllib.request.Request(
             url,
