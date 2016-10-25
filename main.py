@@ -10,7 +10,6 @@ def printPercentage(start, total):
     percent = float(start) / float(total) * 100
     print("{0:.2f}".format(percent)+ "%  " + str(start) + " of " + str(total))
 
-
 def blogExists():
     carry_on= input('already exists. Would you like to continue anyways?(y/n)')
     if (carry_on =='y'):
@@ -27,22 +26,23 @@ def cleanUp(records):
     logger.info('Updating records ...')
     #SQLLITE().insert(records)
 
+
 def main():
     tagging = False
     testurl= 'http://abc.tumblr.com/'
-
+    '''
+    '''
     # baseInput = sys.argv[1]
     logging.basicConfig(level=logging.INFO)
     logger = logging.getLogger(__name__)
     logger.info('Start blog: '+testurl)
 
-    inputurl=Parser().formatInput(testurl)
+    inputurl=Parser.formatInput(testurl)
     logging.info(inputurl)
-    dirname = Parser().getDirectoryName(testurl,tagging)
-
+    dirname = Parser.getDirectoryName(testurl,tagging)
 
     logging.info(dirname)
-    Parser().mkdirs(dirname)
+    Parser.mkdirs(dirname)
     records = {}
     records['total'] = Scraper().getTotalPosts(inputurl)
     records['account'] = inputurl
