@@ -1,49 +1,59 @@
 #!/usr/bin/env python3
-
+import urllib.error
 import urllib.request
 from urllib.error import URLError, HTTPError
 import http.client
 from socket import timeout
+import logging
 
 class Network(object):
-    def getImage(self,url):
-        image=self.getURL(url)
-        ##ADD FILE VERIFICATION
-        print(image.headers.items())
-        return image
+    def getUrlFileHeaders(self,url):
+        file=self.getURL(url)
+        if file.header.items():
+            return file.headers.items()
+        else:
+            return None
 
-    def getVideo(self,url):
-        video=self.getURL(url)
-        video.headers.items()
-        return video
+    def getFileHeaders(self,file):
+        if file.headers.items():
+            return file.headers.items()
+        else:
+            return None
 
 
 
 
     def getURL(self,url):
         liveURL = ''
+        req = urllib.request.Request(
+            url,
+            data=None,
+            headers={
+                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 '
+                              '(KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36'
+            }
+        )
         try:
-            liveURL = urllib.request.urlopen(url, timeout=10)
-        except urllib.error.URLError as e:
-            print('Url Error code: ')
-            print(e.reason)
+            liveURL = urllib.request.urlopen(req, timeout=10)
+        except (urllib.error.HTTPError,urllib.error.URLError) as e:
+            logging.error('Url Error code: ')
+            logging.error(e.reason)
             return False
-            # return false, e.code
-        except urllib.error.HTTPError as e:
-            print('Reason: ', e.reason)
-            return False
-            # return false, e.reason
+
         except http.client.HTTPException as e:
-            print(e)
+            logging.error(e)
             return False
         except urllib.error.ContentTooShortError as e:
-            print(e)
+            logging.error(e)
+            return False
+        except http.client.IncompleteRead as icread:
+            logging.error(icread.partial.decode('utf-8'))
             return False
         except timeout:
-            print('timeout occured..trying next')
+            logging.error('timeout occured..trying next')
             return False
         except Exception as e:
-            print(e)
+            logging.error(e)
             return False
         if liveURL == '':
             return False
@@ -56,9 +66,7 @@ class Network(object):
 #checksLogger.error('generic exception: ' + traceback.format_exc())
 
 '''
-from socket import timeout
-try:
-    response = urllib.request.urlopen(url, timeout=10).read().decode('utf-8')
+
 except (HTTPError, URLError) as error:
     logging.error('Data of %s not retrieved because %s\nURL: %s', name, error, url)
 except timeout:
@@ -66,14 +74,6 @@ except timeout:
 else:
     logging.info('Access successful.')
 
-
-
-
-
-import urllib.parse
-import urllib.request
-
-url = 'http://www.someserver.com/cgi-bin/register.cgi'
 user_agent = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64)'
 values = {'name': '',
           'location': '',
