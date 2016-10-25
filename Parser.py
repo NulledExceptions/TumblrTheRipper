@@ -1,18 +1,22 @@
 #!/usr/bin/env python3
 import os
 import errno
+from os.path import expanduser
+import logging
+
 
 
 
 class Parser(object):
+    #remove instantiation, make methods static
     def __init__(self):
-        True
+        pass
 
     def formatImageName(self, url):
         try:
             filename = url.rsplit('tumblr_', 1)[1]
         except IndexError as e:
-            print(e)
+            logging.debug(e)
             return False
         else:
             return filename
@@ -21,22 +25,31 @@ class Parser(object):
         try:
             filename = url.rsplit('tumblr_', 1)[1] + '.mp4'
         except IndexError as e:
-            print(e)
+            logging.debug(e)
             return False
         else:
             return filename
 
     def writeFile(self, filename, file):
         localImage = open(filename, 'wb')
-        localImage.write(file.read())
+        try:
+            localImage.write(file.read())
+        except:
+            logging.debug('there was an error writing file')
+            localImage.close()
+            pass
         localImage.close()
 
     def mkdirs(self, newdir, mode=0o777):
+        home = expanduser("~")+'/Tumblr/'
+        newdir=home+newdir
         try: os.makedirs(newdir, mode)
         except OSError as exc:
             if exc.errno != errno.EEXIST:
                 raise exc
             pass
+        os.chdir(newdir)
+    ##STRIP WHITE SPACE
     def formatInput(self, input):
         if input[-1] == '/':
             input =input[:-1]
@@ -49,9 +62,13 @@ class Parser(object):
             quit()
         return input + '/api/read'
 
-    def getDirectoryName(self, url):
-        url =url.replace(".tumblr.com","")
+    def getDirectoryName(self, url, tagging):
+        #readable, re would be better
+        url = url.replace(".tumblr.com","")
         url = url.replace("http://","")
         url = url.replace("https://", "")
-        url = 'blogs/'+url
+
+        if tagging:
+            url = '[tag]' + url
+        url = 'blogs/' + url
         return url
