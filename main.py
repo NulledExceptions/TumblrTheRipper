@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from Scraper import Scraper
 from Parser import Parser
-from SQLLITE import SQLLITE
+#from SQLLITE import SQLLITE
 import atexit
 import logging
 
@@ -49,11 +49,11 @@ def main():
     records['account'] = inputurl
     records['current'] = 0
     logger.info('Records: %s', records)
-    dbconn = SQLLITE()
-    if(dbconn.query_account(records['account'])):
-        blogExists()
+    #dbconn = SQLLITE()
+    #if(dbconn.query_account(records['account'])):
+        #blogExists()
     #if not (SQLLITE().insert_initials(records)):
-    dbconn.insert(records)
+    #dbconn.insert(records)
 
 
     if(records['total'] and int(records['total'])>0):
